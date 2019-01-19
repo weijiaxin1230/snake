@@ -53,6 +53,7 @@
             window.location.reload();
         });
         var arrRoad = new Array();
+        //创建背景快
         function enter(index, outStyle, inStyle) {
             for (var i = 1; i <= index * index; i++) {
                 if (i <= index - 1 || i > index * (index - 1)) {
@@ -71,8 +72,8 @@
         arrSnake = [70];
         snake.direction='right';
         snake.timmer='null';
-        $('#demo').children().eq(arrSnake[0]).attr('background-color','white');
-        function init() {
+        //初始化函数，随机生成一个蛇头
+        function start() {
             for (var i = 0; i < arrSnake.length; i++) {
                 $('#demo').children().eq(arrSnake[i]).removeClass('in');
                 $('#demo').children().eq(arrSnake[i]).addClass('snake-body');
@@ -80,7 +81,8 @@
             arrRoad.splice(0, arrSnake.length+1);
             CreateFood();
         }
-        init();
+        start();
+        //让蛇在上下左右四个键下移动
         function move(direction){
             var index=0;
             switch(direction){
@@ -97,14 +99,17 @@
                     index=-1;
                     break;
             }
+            //获取蛇的下一点与蛇的最后一点
             var next = parseInt(arrSnake[0]) + index;
             var last = arrSnake[arrSnake.length - 1];
             var nextclassName = $('#demo').children().eq(next).attr("class").toString();
+            //判断下一点的类不是蛇，不是墙
             if(nextclassName=="out"||nextclassName=="snake-body") {
                 alert("GAME OVER!");
                 clearInterval(snake.timmer);
                 return;
             }
+            //如果是食物，就增加蛇的长度并从背景中删除此点
             else if(nextclassName=="snake-food"){
                 $('#demo').children().eq(next).removeClass();
                 $('#demo').children().eq(next).addClass('snake-body');
@@ -114,6 +119,7 @@
                 CreateFood(arrRoad);
                 return;
             }
+            //找到最后一点从蛇中删除，变成背景块
             var last = arrSnake[arrSnake.length - 1];
             $('#demo').children().eq(next).removeClass();
             $('#demo').children().eq(next).addClass('snake-body');
@@ -126,6 +132,7 @@
             arrSnake.splice(arrSnake.length - 1, 1);
             arrRoad.push(last);
         }
+        //检测上下左右
         $(window).keydown(function(e){
             var sum=e.keyCode;
             // alert(index);
@@ -156,6 +163,7 @@
             }
 
         });
+        //让蛇自动移动函数
         function autoMove(){
             snake.timmer=setInterval(function(){
                 console.log('蛇长度' + arrSnake.length);
@@ -163,6 +171,7 @@
             },200);
         }
         autoMove();
+        //从内层背景块随机创建食物
         function CreateFood(){
             var xFood=parseInt(Math.random() * arrRoad.length);
             console.log(arrRoad.length);
