@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="img/snake.ico">
+    <title>贪食蛇</title>
+    <style>
+        h1{
+            text-align: center ;
+        }
+        #demo{
+            width: 400px;
+            height: 400px;
+            position: absolute;
+            left:50%;
+            margin-left: -200px;
+        }
+        div{
+            width: 20px;
+            height: 20px;
+            float: left;
+        }
+        .snake-body{
+            background:black ;
+        }
+        #snake-head{
+            background: white;
+        }
+        .snake-food{
+            background-image: url("img/food-candy.jpg") ;
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+        }
+        .out {
+            background: gray;
+        }
+
+        .in {
+            background: darkgrey;
+        }
+
+    </style>
+</head>
+<body>
+<h1>贪食蛇  <button id="start">开始</button></h1>
+<div id="demo">
+</div>
+</body>
+<script src="jquery-1.12.4.js"></script>
+<script>
+    $(function(){
+        $("#start").on("click",function(){
+            window.location.reload();
+        });
+        var arrRoad = new Array();
+        function enter(index, outStyle, inStyle) {
+            for (var i = 1; i <= index * index; i++) {
+                if (i <= index - 1 || i > index * (index - 1)) {
+                    $('<div class="' + outStyle + '"></div>').appendTo($('#demo'));
+                } else if (i % index == 0 || i % index == 1) {
+                    $('<div class="' + outStyle + '"></div>').appendTo($('#demo'));
+                } else {
+                    $('<div class="' + inStyle + '"></div>').appendTo($('#demo'));
+                    arrRoad.push(i - 1);
+                }
+            }
+        }
+        enter(20, 'out', 'in');
+        var arrSnake = new Array();
+        var snake=new Object();
+        arrSnake = [70];
+        snake.direction='right';
+        snake.timmer='null';
+        $('#demo').children().eq(arrSnake[0]).attr('background-color','white');
+        function init() {
+            for (var i = 0; i < arrSnake.length; i++) {
+                $('#demo').children().eq(arrSnake[i]).removeClass('in');
+                $('#demo').children().eq(arrSnake[i]).addClass('snake-body');
+            }
+            arrRoad.splice(0, arrSnake.length+1);
+            CreateFood();
+        }
+        init();
+        function move(direction){
+            var index=0;
+            switch(direction){
+                case 'top':
+                    index=-20;
+                    break;
+                case 'right':
+                    index=1;
+                    break;
+                case 'down':
+                    index=20;
+                    break;
+                case 'left':
+                    index=-1;
+                    break;
+            }
+            var next = parseInt(arrSnake[0]) + index;
+            var last = arrSnake[arrSnake.length - 1];
+            var nextclassName = $('#demo').children().eq(next).attr("class").toString();
+            if(nextclassName=="out"||nextclassName=="snake-body") {
+                alert("GAME OVER!");
+                clearInterval(snake.timmer);
+                return;
+            }
+            else if(nextclassName=="snake-food"){
+                $('#demo').children().eq(next).removeClass();
+                $('#demo').children().eq(next).addClass('snake-body');
+                arrSnake.unshift(next);
+                var indxofnext = arrRoad.indexOf(next);
+                arrRoad.splice(indxofnext, 1);
+                CreateFood(arrRoad);
+                return;
+            }
+            var last = arrSnake[arrSnake.length - 1];
+            $('#demo').children().eq(next).removeClass();
+            $('#demo').children().eq(next).addClass('snake-body');
+            arrSnake.unshift(next);
+
+            var indxofnext = arrRoad.indexOf(next);
+            arrRoad.splice(indxofnext, 1);
+            $('#demo').children().eq(last).removeClass();
+            $('#demo').children().eq(last).addClass('in');
+            arrSnake.splice(arrSnake.length - 1, 1);
+            arrRoad.push(last);
+        }
+        $(window).keydown(function(e){
+            var sum=e.keyCode;
+            // alert(index);
+            switch(sum){
+                case 38://上
+                    if(snake.direction!='down'){
+                        snake.direction='top';
+                    }
+                    break;
+                case 39://右
+                    if(snake.direction!='left'){
+                        snake.direction='right';
+                    }
+                    break;
+                case 40://下
+                    if(snake.direction!='top'){
+                        snake.direction='down';
+                    }
+                    break;
+                case 37://左
+                    if(snake.direction!='right'){
+                        snake.direction='left';
+                    }
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+
+        });
+        function autoMove(){
+            snake.timmer=setInterval(function(){
+                console.log('蛇长度' + arrSnake.length);
+                move(snake.direction);
+            },200);
+        }
+        autoMove();
+        function CreateFood(){
+            var xFood=parseInt(Math.random() * arrRoad.length);
+            console.log(arrRoad.length);
+            $('#demo').children().eq(arrRoad[xFood]).removeClass('in');
+            $('#demo').children().eq(arrRoad[xFood]).addClass('snake-food');
+        }
+    })
+
+</script>
+</html>
